@@ -1,115 +1,109 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('todoForm');
+document.addEventListener('DOMContentLoaded', () => {
     const taskInput = document.getElementById('taskInput');
+    const addButton = document.getElementById('add');
     const taskList = document.getElementById('taskList');
+    const countSpan = document.querySelector('.count');
+    const errorText = document.getElementById('error');
 
-    form.addEventListener('submit', function(event) {
-        event.preventDefault();
-        const taskText = taskInput.value.trim();
-        if (taskText !== '') {
-            addTask(taskText);
-            taskInput.value = '';
-        }
-    });
+    let tasks = [];
 
-    taskList.addEventListener('click', function(event) {
-        const target = event.target;
-        if (target.classList.contains('edit')) {
-            enableEditMode(target.closest('li'));
-        } else if (target.classList.contains('save')) {
-            saveTaskEdit(target.closest('li'));
-        } else if (target.classList.contains('cancel')) {
-            cancelTaskEdit(target.closest('li'));
-        }
-    });
+    // Function to render tasks
+    function renderTasks() {
+        taskList.innerHTML = '';
 
-    function addTask(taskText) {
-        const li = createTaskElement(taskText);
-        taskList.appendChild(li);
-    }
+        tasks.forEach((task, index) => {
+            const li = document.createElement('li');
 
-    function createTaskElement(taskText) {
-        const li = document.createElement('li');
-        li.textContent = taskText;
-        
+            // Task name display
+            const taskNameDisplay = document.createElement('span');
+            taskNameDisplay.textContent = task.name;
+            taskNameDisplay.style.marginRight = '10px';
+            taskNameDisplay.style.textDecoration = task.done ? 'line-through' : 'none';
+            li.appendChild(taskNameDisplay);
 
-        const deleteButton = createButton('Delete', 'delete', () => {
-            li.remove();
+            // Add edit button
+            const editButton = createButton('fa fa-pencil', () => {
+                enableInlineEdit(taskNameDisplay, index);
+            });
+            li.appendChild(editButton);
+
+            // Add delete button
+            const deleteButton = createButton('fa fa-trash', () => {
+                deleteTask(index);
+            });
+            li.appendChild(deleteButton);
+
+            // Add done checkbox
+            const doneCheckbox = document.createElement('input');
+            doneCheckbox.type = 'checkbox';
+            doneCheckbox.checked = task.done;
+            doneCheckbox.addEventListener('change', (event) => markTaskDone(index, event.target.checked));
+            li.appendChild(doneCheckbox);
+
+            taskList.appendChild(li);
         });
 
-        const editButton = createButton('Edit', 'edit', () => {
-            enableEditMode(li);
-        });
-
-        li.appendChild(deleteButton);
-        li.appendChild(editButton);
-
-        return li;
+        updateTaskCount(); // Update task count display
     }
 
-    function createButton(text, className, clickHandler) {
+    // Function to create a button with a specified icon and click handler
+    function createButton(iconClass, clickHandler) {
         const button = document.createElement('button');
-        button.textContent = text;
-        button.className = className;
+        button.innerHTML = `<i class="${iconClass}"></i>`;
         button.addEventListener('click', clickHandler);
         return button;
     }
 
-    function enableEditMode(li) {
-        const taskText = li.textContent;
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.value = taskText;
-        input.className = 'edit-input';
-        
-
-        const saveButton = createButton('Save', 'save', () => {
-            saveTaskEdit(li);
-        });
-
-        const cancelButton = createButton('Cancel', 'cancel', () => {
-            cancelTaskEdit(li);
-        });
-
-        li.textContent = '';
-        li.appendChild(input);
-        li.appendChild(saveButton);
-        li.appendChild(cancelButton);
-
-        input.focus(); // Focus on the input field for editing
+    // Function to update the task count display
+    function updateTaskCount() {
+        const incompleteTasks = tasks.filter(task => !task.done).length;
+        countSpan.textContent = incompleteTasks;
     }
 
-    function saveTaskEdit(li) {
-        const input = li.querySelector('.edit-input');
-        const newText = input.value.trim();
-        if (newText !== '') {
-            li.textContent = newText;
-
-            const deleteButton = createButton('Delete', 'delete', () => {
-                li.remove();
-            });
-
-            const editButton = createButton('Edit', 'edit', () => {
-                enableEditMode(li);
-            });
-
-            li.appendChild(deleteButton);
-            li.appendChild(editButton);
+    // Function to add a task
+    function addTask() {
+        const taskName = taskInput.value.trim();
+        if (taskName !== '') {
+            tasks.push({ name: taskName, done: false });
+            taskInput.value = '';
+            renderTasks();
+            errorText.style.display = 'none';
         } else {
-            alert('Task cannot be empty!');
-            enableEditMode(li); // Re-enable edit mode if task is empty
+            errorText.style.display = 'block';
         }
     }
 
-    function cancelTaskEdit(li) {
-        const taskText = li.textContent;
-        li.textContent = '';
-
-        const editButton = createButton('Edit', 'edit', () => {
-            enableEditMode(li);
-        });
-
-        li.textContent = taskText;
-        li.appendChild(editButton);
+    // Function to delete a task
+    function deleteTask(index) {
+        tasks.splice(index, 1);
+        renderTasks();
     }
+
+    // Function to enable inline editing
+    function enableInlineEdit(taskNameDisplay, index) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = taskNameDisplay.textContent;
+        input.style.marginRight = '10px';
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                tasks[index].name = input.value.trim();
+                renderTasks();
+            }
+        });
+        taskNameDisplay.replaceWith(input);
+        input.focus();
+    }
+
+    // Function to mark a task as done
+    function markTaskDone(index, isDone) {
+        tasks[index].done = isDone;
+        renderTasks();
+    }
+
+    // Add task on button click
+    addButton.addEventListener('click', addTask);
+
+    // Render initial tasks
+    renderTasks();
 });

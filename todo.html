@@ -3,26 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Joanna's Todo List</title>
-    <link rel="stylesheet" href="./todo.css">
-    <link rel="shortcut icon" href="./3893692.jpg" type="image/x-icon">
-    
-
-
-
-
-
+    <title>Todo List</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="todo.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Todo List</h1>
-        <form id="todoForm">
-            <input type="text" id="taskInput" placeholder="Enter task...">
-            <button type="submit">Add Task</button>
-        </form>
-        <ul id="taskList"></ul>
+    <div class="app">
+        <div class="container">
+            <div id="wrapper">
+                <input type="text" id="taskInput" placeholder="Enter tasks">
+                <button id="add">Add Task</button>
+            </div>
+            <div id="tasks">
+                <p id="pending-tasks">
+                    You have <span class="count">0</span> task(s) to complete
+                </p>
+                <ul id="taskList">
+                    <!-- Tasks will be added dynamically here -->
+                </ul>
+            </div>
+        </div>
+        <p id="error">Input cannot be empty!</p>
     </div>
-
     <script src="todo.js"></script>
 </body>
 </html>
