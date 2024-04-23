@@ -25,6 +25,13 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.heading{
+    text-align: center;
+    font-size: 30px;
+    font-weight: 500;
+    margin-top:0;
+}
+
 .container {
     display: flex;
     flex-direction: column;
